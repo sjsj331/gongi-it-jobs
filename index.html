@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<title>공공기관 IT 채용 대시보드 · 2026-10-23</title>
+<style>
+:root{
+  --bg:#f6f4fc; --card:#ffffff; --ink:#2b2540; --muted:#7a7391; --line:#ebe7f5;
+  --accent:#7c5cff; --accent-2:#a58bff; --accent-soft:#efeaff;
+  --red:#ff6b81; --red-soft:#ffe6ea; --orange:#ff9f43; --orange-soft:#fff1e2;
+  --yellow:#e0b100; --yellow-soft:#fff8d9; --green:#2bb673; --green-soft:#e3f7ec;
+  --blue:#4d8dff; --blue-soft:#e6efff; --gray-soft:#f0eef5;
+  --shadow:0 2px 10px rgba(80,60,160,.06),0 1px 2px rgba(80,60,160,.05);
+  --radius:16px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Noto Sans KR','Malgun Gothic',sans-serif;
+  font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased;word-break:keep-all}
+a{color:inherit}
+.wrap{max-width:1280px;margin:0 auto;padding:20px 20px 40px}
+header.top{background:linear-gradient(135deg,#8b6dff 0%,#a68cff 55%,#c6b4ff 100%);color:#fff;border-radius:22px;padding:22px 24px;box-shadow:0 8px 24px rgba(124,92,255,.25)}
+.top h1{margin:0;font-size:22px;letter-spacing:-.3px}
+.top .sub{opacity:.9;font-size:13px;margin-top:4px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px}
+.stat{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.28);border-radius:14px;padding:10px 14px;cursor:pointer;transition:background .15s;text-align:left;color:#fff;font:inherit}
+.stat:hover{background:rgba(255,255,255,.28)}
+.stat .n{font-size:24px;font-weight:800;line-height:1.2}
+.stat .l{font-size:12px;opacity:.92}
+.controls{position:sticky;top:0;z-index:5;background:rgba(246,244,252,.92);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);padding:14px 0 10px;margin-top:6px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.search{flex:1 1 280px;position:relative}
+.search input{width:100%;padding:11px 14px 11px 38px;border:1px solid var(--line);border-radius:12px;background:#fff;font:inherit;color:var(--ink);outline:none;box-shadow:var(--shadow)}
+.search input:focus{border-color:var(--accent-2);box-shadow:0 0 0 3px var(--accent-soft)}
+.search svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);opacity:.5}
+select{padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:#fff;font:inherit;color:var(--ink);box-shadow:var(--shadow);cursor:pointer}
+.chips{margin-top:10px;display:flex;gap:6px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:999px;padding:6px 12px;font:inherit;font-size:13px;cursor:pointer;transition:all .12s;white-space:nowrap}
+.chip:hover{border-color:var(--accent-2)}
+.chip.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.chip .c{opacity:.65;font-size:12px;margin-left:3px}
+.chip.on .c{opacity:.85}
+.sep{width:1px;height:22px;background:var(--line);margin:0 4px}
+.meta{display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:13px;margin:6px 2px 10px;gap:8px;flex-wrap:wrap}
+.reset{background:none;border:none;color:var(--accent);font:inherit;font-size:13px;cursor:pointer;padding:0}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px 12px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:8px;position:relative;transition:transform .12s,box-shadow .12s}
+.card:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(80,60,160,.10)}
+.card.closed{opacity:.55}
+.card-top{display:flex;align-items:flex-start;gap:8px}
+.org{font-size:13px;color:var(--accent);font-weight:700;flex:1;min-width:0}
+.title{font-size:15.5px;font-weight:700;line-height:1.42;margin:0;color:var(--ink);text-decoration:none;display:block}
+.title:hover{color:var(--accent)}
+.badges{display:flex;gap:6px;align-items:center;flex-shrink:0}
+.dday{font-size:12px;font-weight:800;border-radius:8px;padding:3px 8px;white-space:nowrap}
+.d-urgent{background:var(--red-soft);color:#e5405e}
+.d-soon{background:var(--orange-soft);color:#d97a16}
+.d-mid{background:var(--yellow-soft);color:#a07d00}
+.d-far{background:var(--green-soft);color:#1f9a5e}
+.d-closed{background:var(--gray-soft);color:var(--muted)}
+.new{font-size:11px;font-weight:800;background:var(--accent);color:#fff;border-radius:6px;padding:2px 6px;letter-spacing:.3px}
+.star{background:none;border:none;cursor:pointer;font-size:20px;line-height:1;padding:0 2px;color:#d4cfe3;transition:transform .1s}
+.star:hover{transform:scale(1.15)}
+.star.on{color:#ffb800}
+.pills{display:flex;gap:6px;flex-wrap:wrap}
+.pill{font-size:12px;border-radius:999px;padding:3px 9px;background:var(--gray-soft);color:#5d5675}
+.p-정규직{background:var(--accent-soft);color:#5b3fe0}
+.p-무기계약직{background:var(--blue-soft);color:#2f6fe0}
+.p-비정규직{background:var(--gray-soft);color:#5d5675}
+.p-청년인턴체험형{background:var(--green-soft);color:#1f9a5e}
+.p-청년인턴채용형{background:#ffe9f5;color:#c63d8f}
+.p-loc{background:#fff;border:1px solid var(--line)}
+.card-foot{display:flex;justify-content:space-between;align-items:center;font-size:12.5px;color:var(--muted);margin-top:auto;padding-top:6px;border-top:1px dashed var(--line)}
+.go{color:var(--accent);text-decoration:none;font-weight:700;white-space:nowrap}
+.go:hover{text-decoration:underline}
+.itnote{font-size:12.5px;line-height:1.45;color:#5b3fe0;background:var(--accent-soft);border-radius:10px;padding:6px 9px}
+.itnote .b{opacity:.75;font-size:11.5px;display:block;margin-top:2px;color:var(--muted)}
+.p-late{background:var(--orange-soft);color:#d97a16}
+.empty{text-align:center;color:var(--muted);padding:60px 10px;background:#fff;border-radius:var(--radius);border:1px dashed var(--line)}
+.more{display:block;margin:16px auto 0;padding:10px 22px;border-radius:12px;border:1px solid var(--accent-2);background:#fff;color:var(--accent);font:inherit;font-weight:700;cursor:pointer}
+footer{margin-top:28px;text-align:center;color:var(--muted);font-size:12.5px;line-height:1.7}
+footer a{color:var(--accent)}
+@media (max-width:640px){
+  .wrap{padding:12px 12px 32px}
+  header.top{padding:18px 16px;border-radius:18px}
+  .top h1{font-size:19px}
+  .stat{padding:8px 10px}
+  .stat .n{font-size:20px}
+  .grid{grid-template-columns:1fr}
+  .chips{flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .chips::-webkit-scrollbar{display:none}
+  select{flex:1 1 40%}
+  .sep{display:none}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <h1>💻 공공기관 IT 채용 대시보드</h1>
+    <div class="sub">잡알리오 진행중 472건 중 IT 분야만 · 업데이트 <b id="upd"></b></div>
+    <div class="stats">
+      <button class="stat" data-quick="all"><div class="n" id="s-total">0</div><div class="l">IT 진행 중</div></button>
+      <button class="stat" data-quick="new"><div class="n" id="s-new">0</div><div class="l" id="s-new-l">신규</div></button>
+      <button class="stat" data-quick="week"><div class="n" id="s-week">0</div><div class="l">이번 주 마감</div></button>
+    </div>
+  </header>
+
+  <div class="controls">
+    <div class="row">
+      <label class="search">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2b2540" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input id="q" type="search" placeholder="기관명 · 공고명 검색" autocomplete="off" aria-label="검색">
+      </label>
+      <select id="loc" aria-label="근무지"><option value="">📍 근무지 전체</option></select>
+      <select id="sort" aria-label="정렬">
+        <option value="deadline">⏰ 마감 임박순</option>
+        <option value="reg">🆕 최근 등록순</option>
+      </select>
+    </div>
+    <div class="chips" id="chips"></div>
+  </div>
+
+  <div class="meta"><span id="count"></span><button class="reset" id="reset">필터 초기화</button></div>
+  <div class="grid" id="grid"></div>
+  <button class="more" id="more" hidden>더 보기</button>
+
+  <footer>
+    출처: 잡알리오 (<a href="https://job.alio.go.kr" target="_blank" rel="noopener">job.alio.go.kr</a>) · 공공기관 채용정보시스템 · <a href="full.html">전체 공고(IT 외) 보기</a><br>
+    데이터 기준일 2026-10-23 · D-day는 열람 시점(한국시간) 기준으로 계산 · 고용형태/근무지 필터는 대표값(첫 번째 값) 기준<br>
+    ‘공고 보기’는 잡알리오 제목 검색 결과로 연결됩니다. ⭐ 즐겨찾기는 이 기기 브라우저에만 저장됩니다.<br>💻 <b>IT 필터</b>: 제목 키워드(전산·정보기술·IT/ICT·정보통신·정보보호/보안·데이터·SW·시스템 개발/운영·네트워크·클라우드·AI·디지털 등, 기관명 제외) + 잡알리오 NCS ‘정보통신’ 분류 + 통합공고는 공고 상세에서 IT 모집분야 확인. 카드의 💻 메모가 IT 해당 분야입니다(통합공고는 일부 분야만 IT).
+  </footer>
+</div>
+
+<script id="data" type="application/json">{"date":"2026-10-23","generated_at":"2026-10-23T09:09+09:00","source":"https://job.alio.go.kr/recruit.do (ing=2 진행중)","total_reported":472,"count":26,"first_load":false,"new_count":4,"postings":[{"id":"77d49d0bd494","no":461,"title":"2026년 하반기 신입직원(전산직 및 장애·보훈) 채용 공고","org":"공무원연금공단","location":"서울","location_more":5,"location_raw":"서울 외 5","emp_type":"정규직","emp_more":0,"emp_raw":"정규직","reg_date":"2026-10-22","deadline":"2026-11-05","days_left":13,"is_new":true,"url":"https://job.alio.go.kr/recruit.do?pageNo=1&search_yn=Y&s_date=2000.01.01&e_date=2099.12.31&order=REG_DATE&search_type=title&keyword=2026%EB%85%84+%ED%95%98%EB%B0%98%EA%B8%B0+%EC%8B%A0%EC%9E%85%EC%A7%81%EC%9B%90%28%EC%A0%84%EC%82%B0%EC%A7%81+%EB%B0%8F+%EC%9E%A5%EC%95%A0%C2%B7%EB%B3%B4%ED%9B%88%29+%EC%B1%84%EC%9A%A9+%EA%B3%B5%EA%B3%A0","it_basis":"확인(공고 상세)","it_note":"하반기 신입 '전산직' 채용(10/22 등록)","it_src":""},{"id":"e2fc35fdcfe1","no":432,"title":"2027년 상반기 체험형 청년인턴 채용 공고","org":"울산항만공사","location":"울산","location_more":0,"location_raw":"울산","emp_type":"청년인턴(체험형)","emp_more":0,"emp_raw":"청년인턴(체험형)","reg_date":"2026-10-22","deadline":"2026-11-05","days_left":13,"is_new":true,"url":"https://job.alio.go.kr/recruit.do?pageNo=1&search_yn=Y&s_date=2000.01.01&e_date=2099.12.31&order=REG_DATE&search_type=title&keyword=2027%EB%85%84+%EC%83%81%EB%B0%98%EA%B8%B0+%EC%B2%B4%ED%97%98%ED%98%95+%EC%B2%AD%EB%85%84%EC%9D%B8%ED%84%B4+%EC%B1%84%EC%9A%A9+%EA%B3%B5%EA%B3%A0","it_basis":"확인(공고 상세)","it_note":"체험형 10명, NCS 정보통신 태그(직전 회차 구성상 '정보기술' 1명 포함 추정 — 공고문 확인 권장)","it_src":"https://job.incruit.com/jobdb_info/jobpost.asp?job=2610220002144"},{"id":"a7d4ccc3d3cb","no":431,"title":"NCS 및 블라인드 기반 직무능력중심 2026년 하반기 신입직원(채용형 인턴) 채용 공고","org":"울산항만공사","location":"울산","location_more":0,"location_raw":"울산","emp_type":"청년인턴(채용형)","emp_more":0,"emp_raw":"청년인턴(채용형) 외 1","reg_date":"2026-10-22","deadline":"2026-11-05","days_left":13,"is_new":true,"url":"https://job.alio.go.kr/recruit.do?pageNo=1&search_yn=Y&s_date=2000.01.01&e_date=2099.12.31&order=REG_DATE&search_type=title&keyword=NCS+%EB%B0%8F+%EB%B8%94%EB%9D%BC%EC%9D%B8%EB%93%9C+%EA%B8%B0%EB%B0%98+%EC%A7%81%EB%AC%B4%EB%8A%A5%EB%A0%A5%EC%A4%91%EC%8B%AC+2026%EB%85%84+%ED%95%98%EB%B0%98%EA%B8%B0+%EC%8B%A0%EC%9E%85%EC%A7%81%EC%9B%90%28%EC%B1%84%EC%9A%A9%ED%98%95+%EC%9D%B8%ED%84%B4%29+%EC%B1%84%EC%9A%A9+%EA%B3%B5%EA%B3%A0","it_basis":"확인(공고 상세)","it_note":"채용형 인턴 '정보기술(IT)' 2명(정보처리·정보보안·빅데이터분석 기사 등 필요) — 나머지 사무행정 5명","it_src":"https://upa.incruit.com/hire/viewhire.asp?projectid=103"},{"id":"7877cb9550a7","no":418,"title":"[한국산업기술진흥원] 2026년 하반기 전문분야 신규직원 공개채용 공고","org":"한국산업기술진흥원","location":"서울","location_more":0,"location_raw":"서울","emp_type":"정규직","emp_more":0,"emp_raw":"정규직","reg_date":"2026-10-22","deadline":"2026-11-06","days_left":14,"is_new":true,"url":"https://job.alio.go.kr/recruit.do?pageNo=1&search_yn=Y&s_date=2000.01.01&e_date=2099.12.31&order=REG_DATE&search_type=title&keyword=%5B%ED%95%9C%EA%B5%AD%EC%82%B0%EC%97%85%EA%B8%B0%EC%88%A0%EC%A7%84%ED%9D%A5%EC%9B%90%5D+2026%EB%85%84+%ED%95%98%EB%B0%98%EA%B8%B0+%EC%A0%84%EB%AC%B8%EB%B6%84%EC%95%BC+%EC%8B%A0%EA%B7%9C%EC%A7%81%EC%9B%90+%EA%B3%B5%EA%B0%9C%EC%B1%84%EC%9A%A9+%EA%B3%B5%EA%B3%A0","it_basis":"확인(공고 상세)","it_note":"정규직 'AI정보화' 2명·'정보보안' 2명(서울 본원, 신입·경력)","it_src":"https://linkareer.com/activity/358912"},{"id":"726dfc24380c","no":396,"title":"한국예술인복지재단 2027년 제1차 직원 채용 공고(정규직, 계약직)","org":"한국예술인복지재단","location":"서울","location_more":0,"location_raw":"서울","emp_type":"비정규직","emp_more":0,"emp_raw":"비정규직 외 1","reg_date":"2026-10-21","deadline":"2026-11-05","days_left":13,"is_new":false,"url":"https://job.alio.go.kr/recruit.do?pageNo=1&search_yn=Y&s_date=2000.01.01&e_date=2099.12.31&order=REG_DATE&search_type=title&keyword=%ED%95%9C%EA%B5%AD%EC%98%88%EC%88%A0%EC%9D%B8%EB%B3%B5%EC%A7%80%EC%9E%AC%EB%8B%A8+2027%EB%85%84+%EC%A0%9C1%EC%B0%A8+%EC%A7%81%EC%9B%90+%EC%B1%84%EC%9A%A9+%EA%B3%B5%EA%B3%A0%28%EC%A0%95%EA%B7%9C%EC%A7%81%2C+%EA%B3%84%EC%95%BD%EC%A7%81%29","it_basis":"확인(공고 상세)","it_note":"일반계약직 '정보화담당' 1명(정규직 모집은 행정·법무)","it_src":"https://kawf.recruiter.co.kr/career/jobs/131787"},{"id":"9ac22ff5a229","no":393,"title":"한국농어촌공사 농지관리처 계약직(AI전문가, 공간정보전문가) 채용 공고","org":"한국농어촌공사","location":"전남광주","location_more":0,"location_raw":"전남광주","emp_type":"비정규직","emp_more":0,"emp_raw":"비정규직","reg_date":"2026-10-21","deadline":"2026-11-05","days_left":13,"is_new":false,"url":"https://job.alio.go.kr/recruit.do?pageNo=1&search_yn=Y&s_date=2000.01.01&e_date=2099.12.31&order=REG_DATE&search_type=title&keyword=%ED%95%9C%EA%B5%AD%EB%86%8D%EC%96%B4%EC%B4%8C%EA%B3%B5%EC%82%AC+%EB%86%8D%EC%A7%80%EA%B4%80%EB%A6%AC%EC%B2%98+%EA%B3%84%EC%95%BD%EC%A7%81%28AI%EC%A0%84%EB%AC%B8%EA%B0%80%2C+%EA%B3%B5%EA%B0%84%EC%A0%95%EB%B3%B4%EC%A0%84%EB%AC%B8%EA%B0%80%29+%EC%B1%84%EC%9A%A9+%EA%B3%B5%EA%B3%A0","it_basis":"키워드: AI · NCS 정보통신","it_note":"","it_src":""},{"id":"dd0157ffd04b","no":380,"title":"한국화학연구원 2026년 하반기 정직원(경영행정) 채용 공고","org":"한국화학연구원","location":"대전","location_more":0,"location_raw":"대전","emp_type":"정규직","emp_more":0,"emp_raw":"정규직","reg_date":"2026-10-21","deadline":"2026-11-06","days_left":14,"is_new":false,"url":"https://job.alio.go.kr/recruit.do?pageNo=1&search_yn=Y&s_date=2000.01.01&e_date=2099.12.31&order=REG_DATE&search_type=title&keyword=%ED%95%9C%EA%B5%AD%ED%99%94%ED%95%99%EC%97%B0%EA%B5%AC%EC%9B%90+2026%EB%85%84+%ED%95%98%EB%B0%98%EA%B8%B0+%EC%A0%95%EC%A7%81%EC%9B%90%28%EA%B2%BD%EC%98%81%ED%96%89%EC%A0%95%29+%EC%B1%84%EC%9A%A9+%EA%B3%B5%EA%B3%A0","it_basis":"확인(공고 상세)","it_note":"경영행정 '전산' 1명(대전, 정규직)","it_src":"https://job.career.co.kr/recruit/view/22203658"},{"id":"4e6f13a49e75","no":358,"title":"2026년 여수광양항만공사 직원 채용 공고","org":"여수광양항만공사","location":"전남광주","location_more":0,"location_raw":"전남광주","emp_type":"정규직","emp_more":0,"emp_raw":"무기계약직 외 1","reg_date":"2026-10-20","deadline":"2026-11-04","days_left":12,"is_new":false,"url":"https://job.alio.go.kr/recruit.do?pageNo=1&search_yn=Y&s_date=2000.01.01&e_date=2099.12.31&order=REG_DATE&search_type=title&keyword=2026%EB%85%84+%EC%97%AC%EC%88%98%EA%B4%91%EC%96%91%ED%95%AD%EB%A7%8C%EA%B3%B5%EC%82%AC+%EC%A7%81%EC%9B%90+%EC%B1%84%EC%9A%A9+%EA%B3%B5%EA%B3%A0","it_basis":"확인(공고 상세)","it_note":"일반직(정규직) '사무(AI)'·'기술(기계(AI))' 분야 포함","it_src":"https://job.alio.go.kr/recruitview.do?idx=306179"},{"id":"906d4e334c1e","no":331,"title":"한전KDN(주) 전북사업처 AMI분야 일괄위탁 및 공사 일용근로자 모집공고","org":"한전KDN","location":"전북","location_more":0,"location_raw":"전북","emp_type":"비정규직","emp_more":0,"emp_raw":"비정규직","reg_date":"2026-10-19","deadline":"2026-11-02","days_left":10,"is_new":false,"url":"https://job.alio.go.kr/recruit.do?pageNo=1&search_yn=Y&s_date=2000.01.01&e_date=2099.12.31&order=REG_DATE&search_type=title&keyword=%ED%95%9C%EC%A0%84KDN%28%EC%A3%BC%29+%EC%A0%84%EB%B6%81%EC%82%AC%EC%97%85%EC%B2%98+AMI%EB%B6%84%EC%95%BC+%EC%9D%BC%EA%B4%84%EC%9C%84%ED%83%81+%EB%B0%8F+%EA%B3%B5%EC%82%AC+%EC%9D%BC%EC%9A%A9%EA%B7%BC%EB%A1%9C%EC%9E%90+%EB%AA%A8%EC%A7%91%EA%B3%B5%EA%B3%A0","it_basis":"키워드: AMI·OA·통신설비 · NCS 정보통신","it_note":"","it_src":""},{"id":"eeb0da8fac05","no":322,"title":"한국건강증진개발원 2026년 하반기 직원(일반직) 채용 공고","org":"한국건강증진개발원","location":"서울","location_more":0,"location_raw":"서울","emp_type":"정규직","emp_more":0,"emp_raw":"정규직","reg_date":"2026-10-19","deadline":"2026-11-02","days_left":10,"is_new":false,"url":"https://job.alio.go.kr/recruit.do?pageNo=1&search_yn=Y&s_date=2000.01.01&e_date=2099.12.31&order=REG_DATE&search_type=title&keyword=%ED%95%9C%EA%B5%AD%EA%B1%B4%EA%B0%95%EC%A6%9D%EC%A7%84%EA%B0%9C%EB%B0%9C%EC%9B%90+2026%EB%85%84+%ED%95%98%EB%B0%98%EA%B8%B0+%EC%A7%81%EC%9B%90%28%EC%9D%BC%EB%B0%98%EC%A7%81%29+%EC%B1%84%EC%9A%A9+%EA%B3%B5%EA%B3%A0","it_basis":"확인(공고 상세)","it_note":"일반직5급 '전산·개인정보보호' 1명(정보화사업·개인정보보호)","it_src":"https://job.alio.go.kr/recruitview.do?idx=306146"},{"id":"708960331ab7","no":311,"title":"한전KDN(주) 광주전남본부 AMI분야 비정규직 모집공고","org":"한전KDN","location":"전남광주","location_more":0,"location_raw":"전남광주","emp_type":"비정규직","emp_more":0,"emp_raw":"비정규직","reg_date":"2026-10-16","deadline":"2026-10-30","days_left":7,"is_new":false,"url":"https://job.alio.go.kr/recruit.do?pageNo=1&search_yn=Y&s_date=2000.01.01&e_date=2099.12.31&order=REG_DATE&search_type=title&keyword=%ED%95%9C%EC%A0%84KDN%28%EC%A3%BC%29+%EA%B4%91%EC%A3%BC%EC%A0%84%EB%82%A8%EB%B3%B8%EB%B6%80+AMI%EB%B6%84%EC%95%BC+%EB%B9%84%EC%A0%95%EA%B7%9C%EC%A7%81+%EB%AA%A8%EC%A7%91%EA%B3%B5%EA%B3%A0","it_basis":"키워드: AMI·OA·통신설비 · NCS 정보통신","it_note":"","it_src":""},{"id":"7c6d119f9a1a","no":291,"title":"한국재정정보원 2026년도 제5차 채용(정규직, 체험형 청년인턴)","org":"한국재정정보원","location":"서울","location_more":7,"location_raw":"서울 외 7","emp_type":"정규직","emp_more":0,"emp_raw":"청년인턴(체험형) 외 1","reg_date":"2026-10-16","deadline":"2026-11-02","days_left":10,"is_new":false,"url":"https://job.alio.go.kr/recruit.do?pageNo=1&search_yn=Y&s_date=2000.01.01&e_date=2099.12.31&order=REG_DATE&search_type=title&keyword=%ED%95%9C%EA%B5%AD%EC%9E%AC%EC%A0%95%EC%A0%95%EB%B3%B4%EC%9B%90+2026%EB%85%84%EB%8F%84+%EC%A0%9C5%EC%B0%A8+%EC%B1%84%EC%9A%A9%28%EC%A0%95%EA%B7%9C%EC%A7%81%2C+%EC%B2%B4%ED%97%98%ED%98%95+%EC%B2%AD%EB%85%84%EC%9D%B8%ED%84%B4%29","it_basis":"확인(공고 상세)","it_note":"정규직 일반직5급 전산 3명(시스템 운영 1, 인프라시스템 운영·대전 2) — 청년인턴은 운영지원(비IT)","it_src":"https://job.alio.go.kr/recruitview.do?idx=306106"},{"id":"0d6d916433ea","no":264,"title":"(수정) 한국관세정보원 2026년도 제3차 직원(관세행정운영본부장) 채용공고","org":"한국관세정보원","location":"대전","location_more":0,"location_raw":"대전","emp_type":"비정규직","emp_more":0,"emp_raw":"비정규직","reg_date":"2026-10-15","deadline":"2026-10-29","days_left":6,"is_new":false,"url":"https://job.alio.go.kr/recruit.do?pageNo=1&search_yn=Y&s_date=2000.01.01&e_date=2099.12.31&order=REG_DATE&search_type=title&keyword=%28%EC%88%98%EC%A0%95%29+%ED%95%9C%EA%B5%AD%EA%B4%80%EC%84%B8%EC%A0%95%EB%B3%B4%EC%9B%90+2026%EB%85%84%EB%8F%84+%EC%A0%9C3%EC%B0%A8+%EC%A7%81%EC%9B%90%28%EA%B4%80%EC%84%B8%ED%96%89%EC%A0%95%EC%9A%B4%EC%98%81%EB%B3%B8%EB%B6%80%EC%9E%A5%29+%EC%B1%84%EC%9A%A9%EA%B3%B5%EA%B3%A0","it_basis":"확인(공고 상세)","it_note":"관세 IT(UNI-PASS) 운영 전문기관의 본부장(임원급 계약직) · NCS 정보통신","it_src":""},{"id":"057497180707","no":261,"title":"한국석유공사 2026년 직원(경력직) 채용 공고","org":"한국석유공사","location":"울산","location_more":0,"location_raw":"울산","emp_type":"정규직","emp_more":0,"emp_raw":"정규직","reg_date":"2026-10-15","deadline":"2026-10-30","days_left":7,"is_new":false,"url":"https://job.alio.go.kr/recruit.do?pageNo=1&search_yn=Y&s_date=2000.01.01&e_date=2099.12.31&order=REG_DATE&search_type=title&keyword=%ED%95%9C%EA%B5%AD%EC%84%9D%EC%9C%A0%EA%B3%B5%EC%82%AC+2026%EB%85%84+%EC%A7%81%EC%9B%90%28%EA%B2%BD%EB%A0%A5%EC%A7%81%29+%EC%B1%84%EC%9A%A9+%EA%B3%B5%EA%B3%A0","it_basis":"확인(공고 상세)","it_note":"정규직 경력 '사이버보안' 분야 포함","it_src":"https://job.alio.go.kr/recruitview.do?idx=306086"},{"id":"3fa1f8a1c401","no":260,"title":"한국석유공사 2026년 직원(개방형 계약직) 채용 공고","org":"한국석유공사","location":"울산","location_more":0,"location_raw":"울산","emp_type":"비정규직","emp_more":0,"emp_raw":"비정규직","reg_date":"2026-10-15","deadline":"2026-10-30","days_left":7,"is_new":false,"url":"https://job.alio.go.kr/recruit.do?pageNo=1&search_yn=Y&s_date=2000.01.01&e_date=2099.12.31&order=REG_DATE&search_type=title&keyword=%ED%95%9C%EA%B5%AD%EC%84%9D%EC%9C%A0%EA%B3%B5%EC%82%AC+2026%EB%85%84+%EC%A7%81%EC%9B%90%28%EA%B0%9C%EB%B0%A9%ED%98%95+%EA%B3%84%EC%95%BD%EC%A7%81%29+%EC%B1%84%EC%9A%A9+%EA%B3%B5%EA%B3%A0","it_basis":"확인(공고 상세)","it_note":"개방형 계약직 'AI·데이터혁신' 1명","it_src":"https://www.yna.co.kr/view/AKR20261016063100003"},{"id":"296727795218","no":243,"title":"한전KDN(주) 용인지사 OA설비 유지보수 일용근로자 모집공고","org":"한전KDN","location":"경기","location_more":0,"location_raw":"경기","emp_type":"비정규직","emp_more":0,"emp_raw":"비정규직","reg_date":"2026-10-15","deadline":"2026-10-29","days_left":6,"is_new":false,"url":"https://job.alio.go.kr/recruit.do?pageNo=1&search_yn=Y&s_date=2000.01.01&e_date=2099.12.31&order=REG_DATE&search_type=title&keyword=%ED%95%9C%EC%A0%84KDN%28%EC%A3%BC%29+%EC%9A%A9%EC%9D%B8%EC%A7%80%EC%82%AC+OA%EC%84%A4%EB%B9%84+%EC%9C%A0%EC%A7%80%EB%B3%B4%EC%88%98+%EC%9D%BC%EC%9A%A9%EA%B7%BC%EB%A1%9C%EC%9E%90+%EB%AA%A8%EC%A7%91%EA%B3%B5%EA%B3%A0","it_basis":"키워드: AMI·OA·통신설비 · NCS 정보통신","it_note":"","it_src":""},{"id":"25594555d276","no":206,"title":"예금보험공사 통신·시설관리직 채용 안내","org":"예금보험공사","location":"서울","location_more":0,"location_raw":"서울","emp_type":"정규직","emp_more":0,"emp_raw":"정규직","reg_date":"2026-10-14","deadline":"2026-10-28","days_left":5,"is_new":false,"url":"https://job.alio.go.kr/recruit.do?pageNo=1&search_yn=Y&s_date=2000.01.01&e_date=2099.12.31&order=REG_DATE&search_type=title&keyword=%EC%98%88%EA%B8%88%EB%B3%B4%ED%97%98%EA%B3%B5%EC%82%AC+%ED%86%B5%EC%8B%A0%C2%B7%EC%8B%9C%EC%84%A4%EA%B4%80%EB%A6%AC%EC%A7%81+%EC%B1%84%EC%9A%A9+%EC%95%88%EB%82%B4","it_basis":"확인(공고 상세)","it_note":"정규직 1명 — 전화교환기 등 통신·방송설비 운용 + 사옥 시설관리(경력 3년+)","it_src":"https://job.alio.go.kr/recruitview.do?idx=306007"},{"id":"3a7c4c161ea5","no":192,"title":"[부산보훈병원] 정규직(방사선사, 전산, 간호조무사) 긴급채용공고","org":"한국보훈복지의료공단","location":"부산","location_more":0,"location_raw":"부산","emp_type":"정규직","emp_more":0,"emp_raw":"정규직","reg_date":"2026-10-13","deadline":"2026-10-23","days_left":0,"is_new":false,"url":"https://job.alio.go.kr/recruit.do?pageNo=1&search_yn=Y&s_date=2000.01.01&e_date=2099.12.31&order=REG_DATE&search_type=title&keyword=%5B%EB%B6%80%EC%82%B0%EB%B3%B4%ED%9B%88%EB%B3%91%EC%9B%90%5D+%EC%A0%95%EA%B7%9C%EC%A7%81%28%EB%B0%A9%EC%82%AC%EC%84%A0%EC%82%AC%2C+%EC%A0%84%EC%82%B0%2C+%EA%B0%84%ED%98%B8%EC%A1%B0%EB%AC%B4%EC%82%AC%29+%EA%B8%B4%EA%B8%89%EC%B1%84%EC%9A%A9%EA%B3%B5%EA%B3%A0","it_basis":"키워드: 전산","it_note":"","it_src":""},{"id":"b618aa7f6405","no":191,"title":"한전KDN(주) 목포지사 AMI분야 비정규직(장애인) 모집공고(재공고)","org":"한전KDN","location":"전남광주","location_more":0,"location_raw":"전남광주","emp_type":"비정규직","emp_more":0,"emp_raw":"비정규직","reg_date":"2026-10-13","deadline":"2026-10-26","days_left":3,"is_new":false,"url":"https://job.alio.go.kr/recruit.do?pageNo=1&search_yn=Y&s_date=2000.01.01&e_date=2099.12.31&order=REG_DATE&search_type=title&keyword=%ED%95%9C%EC%A0%84KDN%28%EC%A3%BC%29+%EB%AA%A9%ED%8F%AC%EC%A7%80%EC%82%AC+AMI%EB%B6%84%EC%95%BC+%EB%B9%84%EC%A0%95%EA%B7%9C%EC%A7%81%28%EC%9E%A5%EC%95%A0%EC%9D%B8%29+%EB%AA%A8%EC%A7%91%EA%B3%B5%EA%B3%A0%28%EC%9E%AC%EA%B3%B5%EA%B3%A0%29","it_basis":"키워드: AMI·OA·통신설비 · NCS 정보통신","it_note":"","it_src":""},{"id":"11158dae0989","no":185,"title":"[한전KPS(주)]2026년도 하반기 신입사원 채용공고","org":"한전KPS(주)","location":"서울","location_more":16,"location_raw":"서울 외 16","emp_type":"정규직","emp_more":0,"emp_raw":"정규직","reg_date":"2026-10-13","deadline":"2026-10-28","days_left":5,"is_new":false,"url":"https://job.alio.go.kr/recruit.do?pageNo=1&search_yn=Y&s_date=2000.01.01&e_date=2099.12.31&order=REG_DATE&search_type=title&keyword=%5B%ED%95%9C%EC%A0%84KPS%28%EC%A3%BC%29%5D2026%EB%85%84%EB%8F%84+%ED%95%98%EB%B0%98%EA%B8%B0+%EC%8B%A0%EC%9E%85%EC%82%AC%EC%9B%90+%EC%B1%84%EC%9A%A9%EA%B3%B5%EA%B3%A0","it_basis":"확인(공고 상세)","it_note":"G4 경영·회계·사무 '전산' 1명(전산학 필기) — 나머지는 기계·전기","it_src":"https://kps.saramin.co.kr/service/kps/4010/applicant/apply/recruit_default.asp"},{"id":"fb95ec97c2df","no":173,"title":"한국의약품안전관리원 2026년 3차 채용 공고(정규직, 전문/일반계약직, 일반계약직(육아휴직 대체))","org":"한국의약품안전관리원","location":"경기","location_more":0,"location_raw":"경기","emp_type":"정규직","emp_more":0,"emp_raw":"비정규직 외 1","reg_date":"2026-10-13","deadline":"2026-10-27","days_left":4,"is_new":false,"url":"https://job.alio.go.kr/recruit.do?pageNo=1&search_yn=Y&s_date=2000.01.01&e_date=2099.12.31&order=REG_DATE&search_type=title&keyword=%ED%95%9C%EA%B5%AD%EC%9D%98%EC%95%BD%ED%92%88%EC%95%88%EC%A0%84%EA%B4%80%EB%A6%AC%EC%9B%90+2026%EB%85%84+3%EC%B0%A8+%EC%B1%84%EC%9A%A9+%EA%B3%B5%EA%B3%A0%28%EC%A0%95%EA%B7%9C%EC%A7%81%2C+%EC%A0%84%EB%AC%B8%2F%EC%9D%BC%EB%B0%98%EA%B3%84%EC%95%BD%EC%A7%81%2C+%EC%9D%BC%EB%B0%98%EA%B3%84%EC%95%BD%EC%A7%81%28%EC%9C%A1%EC%95%84%ED%9C%B4%EC%A7%81+%EB%8C%80%EC%B2%B4%29%29","it_basis":"확인(공고 상세)","it_note":"정규직 일반직5급 '전산' 1명(정보시스템·사이버보안·개인정보보호)","it_src":"https://job.alio.go.kr/recruitview.do?idx=305962"},{"id":"ec25c3643027","no":170,"title":"한전KDN(주) 대구본부 정보통신설비 유지보수 일용근로자 모집공고","org":"한전KDN","location":"대구","location_more":1,"location_raw":"대구 외 1","emp_type":"비정규직","emp_more":0,"emp_raw":"비정규직","reg_date":"2026-10-12","deadline":"2026-10-26","days_left":3,"is_new":false,"url":"https://job.alio.go.kr/recruit.do?pageNo=1&search_yn=Y&s_date=2000.01.01&e_date=2099.12.31&order=REG_DATE&search_type=title&keyword=%ED%95%9C%EC%A0%84KDN%28%EC%A3%BC%29+%EB%8C%80%EA%B5%AC%EB%B3%B8%EB%B6%80+%EC%A0%95%EB%B3%B4%ED%86%B5%EC%8B%A0%EC%84%A4%EB%B9%84+%EC%9C%A0%EC%A7%80%EB%B3%B4%EC%88%98+%EC%9D%BC%EC%9A%A9%EA%B7%BC%EB%A1%9C%EC%9E%90+%EB%AA%A8%EC%A7%91%EA%B3%B5%EA%B3%A0","it_basis":"키워드: 정보통신, AMI·OA·통신설비 · NCS 정보통신","it_note":"","it_src":""},{"id":"3d40de018bde","no":163,"title":"2026년 하반기 한전 전력연구원 위촉연구원 채용공고","org":"한국전력공사","location":"대전","location_more":1,"location_raw":"대전 외 1","emp_type":"비정규직","emp_more":0,"emp_raw":"비정규직","reg_date":"2026-10-12","deadline":"2026-10-27","days_left":4,"is_new":false,"url":"https://job.alio.go.kr/recruit.do?pageNo=1&search_yn=Y&s_date=2000.01.01&e_date=2099.12.31&order=REG_DATE&search_type=title&keyword=2026%EB%85%84+%ED%95%98%EB%B0%98%EA%B8%B0+%ED%95%9C%EC%A0%84+%EC%A0%84%EB%A0%A5%EC%97%B0%EA%B5%AC%EC%9B%90+%EC%9C%84%EC%B4%89%EC%97%B0%EA%B5%AC%EC%9B%90+%EC%B1%84%EC%9A%A9%EA%B3%B5%EA%B3%A0","it_basis":"확인(공고 상세)","it_note":"위촉연구원 '컴퓨터/전산'(석사급) 분야 포함","it_src":"https://job.alio.go.kr/recruitview.do?idx=305874"},{"id":"82b66adf4220","no":159,"title":"제2026-6호 한국청소년상담복지개발원 직원 모집","org":"한국청소년상담복지개발원","location":"부산","location_more":0,"location_raw":"부산","emp_type":"청년인턴(채용형)","emp_more":0,"emp_raw":"비정규직 외 1","reg_date":"2026-10-12","deadline":"2026-10-27","days_left":4,"is_new":false,"url":"https://job.alio.go.kr/recruit.do?pageNo=1&search_yn=Y&s_date=2000.01.01&e_date=2099.12.31&order=REG_DATE&search_type=title&keyword=%EC%A0%9C2026-6%ED%98%B8+%ED%95%9C%EA%B5%AD%EC%B2%AD%EC%86%8C%EB%85%84%EC%83%81%EB%8B%B4%EB%B3%B5%EC%A7%80%EA%B0%9C%EB%B0%9C%EC%9B%90+%EC%A7%81%EC%9B%90+%EB%AA%A8%EC%A7%91","it_basis":"확인(공고 상세)","it_note":"채용형 청년인턴 '빅데이터 관리' 1명 — 나머지는 상담·행정 기간제","it_src":"https://job.alio.go.kr/recruitview.do?idx=305905"},{"id":"e4050e6bc396","no":154,"title":"[제2026-10] 한국통계정보원 무기계약직(경력직) 제한경쟁 채용 공고","org":"(재)한국통계정보원","location":"대전","location_more":0,"location_raw":"대전","emp_type":"정규직","emp_more":0,"emp_raw":"정규직","reg_date":"2026-10-12","deadline":"2026-10-26","days_left":3,"is_new":false,"url":"https://job.alio.go.kr/recruit.do?pageNo=1&search_yn=Y&s_date=2000.01.01&e_date=2099.12.31&order=REG_DATE&search_type=title&keyword=%5B%EC%A0%9C2026-10%5D+%ED%95%9C%EA%B5%AD%ED%86%B5%EA%B3%84%EC%A0%95%EB%B3%B4%EC%9B%90+%EB%AC%B4%EA%B8%B0%EA%B3%84%EC%95%BD%EC%A7%81%28%EA%B2%BD%EB%A0%A5%EC%A7%81%29+%EC%A0%9C%ED%95%9C%EA%B2%BD%EC%9F%81+%EC%B1%84%EC%9A%A9+%EA%B3%B5%EA%B3%A0","it_basis":"확인(공고 상세)","it_note":"전산(응용SW개발·IT인프라 운영, 경력 3년+)·데이터(데이터 구축·운영) 분야","it_src":"https://job.alio.go.kr/recruitview.do?idx=305910"},{"id":"1eeadef17d88","no":107,"title":"(수정) [직원채용] 동남권원자력의학원 박사후 연수연구원(첨단방사선AI융합연구팀) 공개 채용","org":"동남권원자력의학원","location":"부산","location_more":0,"location_raw":"부산","emp_type":"비정규직","emp_more":0,"emp_raw":"비정규직","reg_date":"2026-07-28","deadline":"2026-10-26","days_left":3,"is_new":false,"url":"https://job.alio.go.kr/recruit.do?pageNo=1&search_yn=Y&s_date=2000.01.01&e_date=2099.12.31&order=REG_DATE&search_type=title&keyword=%28%EC%88%98%EC%A0%95%29+%5B%EC%A7%81%EC%9B%90%EC%B1%84%EC%9A%A9%5D+%EB%8F%99%EB%82%A8%EA%B6%8C%EC%9B%90%EC%9E%90%EB%A0%A5%EC%9D%98%ED%95%99%EC%9B%90+%EB%B0%95%EC%82%AC%ED%9B%84+%EC%97%B0%EC%88%98%EC%97%B0%EA%B5%AC%EC%9B%90%28%EC%B2%A8%EB%8B%A8%EB%B0%A9%EC%82%AC%EC%84%A0AI%EC%9C%B5%ED%95%A9%EC%97%B0%EA%B5%AC%ED%8C%80%29+%EA%B3%B5%EA%B0%9C+%EC%B1%84%EC%9A%A9","it_basis":"키워드: AI","it_note":"","it_src":""}],"filter":"IT","filter_doc":"README.md §IT-only","total_all":472,"added_after_sweep":0}</script>
+<script>
+(function(){
+  'use strict';
+  var D = JSON.parse(document.getElementById('data').textContent);
+  var P = D.postings || [];
+  var FAV_KEY = 'alio_jobs_favs_v1';
+  var favs = {};
+  try { favs = JSON.parse(localStorage.getItem(FAV_KEY) || '{}') || {}; } catch(e) { favs = {}; }
+  function saveFavs(){ try { localStorage.setItem(FAV_KEY, JSON.stringify(favs)); } catch(e){} }
+
+  // today in Asia/Seoul
+  function kstToday(){
+    var now = new Date(Date.now() + 9*3600*1000);
+    return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+  }
+  var TODAY = kstToday();
+  function parseISO(s){ var a=s.split('-'); return new Date(Date.UTC(+a[0], +a[1]-1, +a[2])); }
+  var dow = (TODAY.getUTCDay()+6)%7; // Mon=0
+  var weekEnd = new Date(TODAY.getTime() + (6-dow)*86400000);
+  P.forEach(function(p){
+    var d = parseISO(p.deadline);
+    p._d = Math.round((d - TODAY)/86400000);
+    p._week = p._d >= 0 && d <= weekEnd;
+    p._hay = (p.org + ' ' + p.title + ' ' + (p.it_note||'')).toLowerCase();
+  });
+  var open = P.filter(function(p){ return p._d >= 0; });
+
+  // header
+  document.getElementById('upd').textContent = (D.generated_at || D.date).replace('T',' ').replace('+09:00',' KST');
+  document.getElementById('s-total').textContent = open.length;
+  var newCount = open.filter(function(p){return p.is_new;}).length;
+  document.getElementById('s-new').textContent = D.first_load ? '–' : newCount;
+  if (D.first_load) document.getElementById('s-new-l').textContent = '신규 (첫 수집)';
+  document.getElementById('s-week').textContent = open.filter(function(p){return p._week;}).length;
+
+  // state
+  var S = { q:'', loc:'', types:{}, onlyNew:false, urgent:false, week:false, fav:false, showClosed:false, sort:'deadline', limit:60 };
+
+  // chips
+  var TYPE_ORDER = ['정규직','무기계약직','비정규직','청년인턴(채용형)','청년인턴(체험형)'];
+  var typeCounts = {};
+  open.forEach(function(p){ typeCounts[p.emp_type] = (typeCounts[p.emp_type]||0)+1; });
+  var types = Object.keys(typeCounts).sort(function(a,b){
+    var ia=TYPE_ORDER.indexOf(a), ib=TYPE_ORDER.indexOf(b);
+    return (ia<0?99:ia)-(ib<0?99:ib) || a.localeCompare(b);
+  });
+  var chipsEl = document.getElementById('chips');
+  function chip(label, count, key, val){
+    var b = document.createElement('button');
+    b.className = 'chip'; b.type='button';
+    b.dataset.key = key; if (val!=null) b.dataset.val = val;
+    b.innerHTML = esc(label) + (count!=null ? '<span class="c">'+count+'</span>' : '');
+    chipsEl.appendChild(b); return b;
+  }
+  types.forEach(function(t){ chip(t, typeCounts[t], 'type', t); });
+  var s1 = document.createElement('span'); s1.className='sep'; chipsEl.appendChild(s1);
+  chip('🆕 신규만', D.first_load?null:newCount, 'onlyNew');
+  chip('🔥 마감 임박(D-7)', open.filter(function(p){return p._d<=7;}).length, 'urgent');
+  chip('📅 이번 주 마감', null, 'week');
+  chip('⭐ 즐겨찾기', null, 'fav');
+
+  // location dropdown
+  var locCounts = {};
+  open.forEach(function(p){ locCounts[p.location]=(locCounts[p.location]||0)+1; });
+  var locSel = document.getElementById('loc');
+  Object.keys(locCounts).sort(function(a,b){return locCounts[b]-locCounts[a];}).forEach(function(l){
+    var o=document.createElement('option'); o.value=l; o.textContent=l+' ('+locCounts[l]+')'; locSel.appendChild(o);
+  });
+
+  function esc(s){ return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+  function ddayCls(d){ if(d<0) return 'd-closed'; if(d<=3) return 'd-urgent'; if(d<=7) return 'd-soon'; if(d<=14) return 'd-mid'; return 'd-far'; }
+  function ddayTxt(d){ return d<0 ? '마감' : d===0 ? 'D-Day' : 'D-'+d; }
+  function fmt(iso){ var a=iso.split('-'); return a[0].slice(2)+'.'+a[1]+'.'+a[2]; }
+  function typeCls(t){ return 'p-'+t.replace(/[()\s]/g,''); }
+
+  function filtered(){
+    var q = S.q.trim().toLowerCase();
+    var terms = q ? q.split(/\s+/) : [];
+    var anyType = Object.keys(S.types).some(function(k){return S.types[k];});
+    var list = (S.showClosed ? P : open).filter(function(p){
+      if (terms.length && !terms.every(function(t){return p._hay.indexOf(t)>=0;})) return false;
+      if (S.loc && p.location !== S.loc) return false;
+      if (anyType && !S.types[p.emp_type]) return false;
+      if (S.onlyNew && !p.is_new) return false;
+      if (S.urgent && !(p._d>=0 && p._d<=7)) return false;
+      if (S.week && !p._week) return false;
+      if (S.fav && !favs[p.id]) return false;
+      return true;
+    });
+    list.sort(S.sort==='reg'
+      ? function(a,b){ return b.reg_date.localeCompare(a.reg_date) || a._d-b._d || b.no-a.no; }
+      : function(a,b){ return a._d-b._d || b.reg_date.localeCompare(a.reg_date) || b.no-a.no; });
+    return list;
+  }
+
+  var grid = document.getElementById('grid');
+  function card(p){
+    var fav = !!favs[p.id];
+    var locTxt = p.location + (p.location_more ? ' 외 '+p.location_more : '');
+    var typeTxt = p.emp_type + (p.emp_more ? ' 외 '+p.emp_more : '');
+    return '<article class="card'+(p._d<0?' closed':'')+'" data-id="'+p.id+'">'+
+      '<div class="card-top"><div class="org">'+esc(p.org)+'</div><div class="badges">'+
+        (p.is_new?'<span class="new">NEW</span>':'')+
+        '<span class="dday '+ddayCls(p._d)+'">'+ddayTxt(p._d)+'</span>'+
+        '<button class="star'+(fav?' on':'')+'" type="button" aria-label="즐겨찾기" title="즐겨찾기" data-fav="'+p.id+'">'+(fav?'★':'☆')+'</button>'+
+      '</div></div>'+
+      '<a class="title" href="'+esc(p.url)+'" target="_blank" rel="noopener">'+esc(p.title)+'</a>'+
+      '<div class="pills"><span class="pill '+typeCls(p.emp_type)+'">'+esc(typeTxt)+'</span><span class="pill p-loc">📍 '+esc(locTxt)+'</span>'+
+        (p.added_after_sweep?'<span class="pill p-late">오늘 추가 등록</span>':'')+'</div>'+
+      ((p.it_note||p.it_basis)?'<div class="itnote">'+(p.it_note?'💻 '+esc(p.it_note):'')+(p.it_basis?'<span class="b">근거: '+esc(p.it_basis)+'</span>':'')+'</div>':'')+
+      '<div class="card-foot"><span>'+fmt(p.reg_date)+' ~ '+fmt(p.deadline)+'</span>'+
+      '<a class="go" href="'+esc(p.url)+'" target="_blank" rel="noopener">공고 보기 ↗</a></div>'+
+    '</article>';
+  }
+
+  function render(){
+    var list = filtered();
+    var shown = list.slice(0, S.limit);
+    grid.innerHTML = shown.length ? shown.map(card).join('') :
+      '<div class="empty">조건에 맞는 공고가 없어요 🫥<br><small>필터를 조정해 보세요.</small></div>';
+    document.getElementById('count').textContent = '검색 결과 ' + list.length + '건' + (list.length>shown.length ? ' · '+shown.length+'건 표시' : '');
+    var more = document.getElementById('more');
+    more.hidden = list.length <= shown.length;
+    more.textContent = '더 보기 (' + (list.length-shown.length) + '건 남음)';
+    Array.prototype.forEach.call(chipsEl.children, function(b){
+      if (!b.dataset.key) return;
+      var k=b.dataset.key, on = k==='type' ? !!S.types[b.dataset.val] : !!S[k];
+      b.classList.toggle('on', on);
+    });
+  }
+
+  // events
+  var t;
+  document.getElementById('q').addEventListener('input', function(e){
+    clearTimeout(t); var v=e.target.value; t=setTimeout(function(){ S.q=v; S.limit=60; render(); }, 120);
+  });
+  locSel.addEventListener('change', function(e){ S.loc=e.target.value; S.limit=60; render(); });
+  document.getElementById('sort').addEventListener('change', function(e){ S.sort=e.target.value; render(); });
+  chipsEl.addEventListener('click', function(e){
+    var b = e.target.closest('.chip'); if(!b) return;
+    var k=b.dataset.key;
+    if (k==='type') S.types[b.dataset.val] = !S.types[b.dataset.val]; else S[k] = !S[k];
+    S.limit=60; render();
+  });
+  grid.addEventListener('click', function(e){
+    var b = e.target.closest('[data-fav]'); if(!b) return;
+    var id=b.dataset.fav;
+    if (favs[id]) delete favs[id]; else favs[id]=1;
+    saveFavs();
+    if (S.fav) render(); else { b.classList.toggle('on', !!favs[id]); b.textContent = favs[id]?'★':'☆'; }
+  });
+  document.getElementById('more').addEventListener('click', function(){ S.limit += 60; render(); });
+  function reset(){
+    S.q=''; S.loc=''; S.types={}; S.onlyNew=false; S.urgent=false; S.week=false; S.fav=false; S.limit=60;
+    document.getElementById('q').value=''; locSel.value='';
+  }
+  document.getElementById('reset').addEventListener('click', function(){ reset(); render(); });
+  Array.prototype.forEach.call(document.querySelectorAll('.stat'), function(b){
+    b.addEventListener('click', function(){
+      reset(); var k=b.dataset.quick;
+      if (k==='new') S.onlyNew=true; if (k==='week') S.week=true;
+      render(); document.querySelector('.controls').scrollIntoView({behavior:'smooth'});
+    });
+  });
+  render();
+})();
+</script>
+</body>
+</html>
